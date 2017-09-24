@@ -3,22 +3,23 @@
 
 A reaspberry pi powered control platform for controlling an ROV.
 
+## TODO:
+- [ ] turn off the raspberry pi 3's wifi
+- [ ] instructions on how to clone / install project
+- [ ] script that does all the things automatically
+- [ ] script to build an r-pi image
+- [ ] setting up a supervisor to keep control scripts running
+- [ ] Control loop
+    switches and pwm framework for sending commands via WS and receiving it and processing
+- [ ] esc control loop
+    data from sensor gets processed and turned into ESC output signals for thrusters.
+system status message with current output settings for all devices. ( provides feedback to the interface, switch status, thruster output )
+
 ## setup
 Burn
 
 The default image has ssh disabled by default, to get around that drop a `ssh` file into the boot directory.
 The file doesn't have to have an extension or contents.
-
-TODO:
--[] turn off the raspberry pi 3's wifi
--[] instructions on how to clone project
--[] script that does all the things automatically
--[] setting up a supervisor to keep control scripts running
--[] Control loop
-- switches and pwm framework for sending commands via WS and receiving it and processing
--[] esc control loop
-- data from sensor gets processed and turned into ESC output signals for thrusters.
-system status message with current output settings for all devices. ( provides feedback to the interface, switch status, thruster output )
 
 on OSX:
 ```shell
