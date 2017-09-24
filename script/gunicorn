@@ -1,0 +1,4 @@
+#!/bin/sh
+# Start the gunicorn websocket server
+# server:resource is from server.py
+gunicorn -k "geventwebsocket.gunicorn.workers.GeventWebSocketWorker" server:resource
