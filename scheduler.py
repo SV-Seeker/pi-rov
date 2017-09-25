@@ -36,7 +36,6 @@ class LoopScheduler:
             callback(*args, **kwargs)
             post_callback = time.time()
             new_next_schedule = max(0, loop_time - (post_callback - pre_callback))
-            # import ipdb; ipdb.set_trace()
             # start the loop over
             event = self.scheduler.enter(
                 new_next_schedule, importance, wrapped_func)
@@ -67,6 +66,12 @@ class LoopScheduler:
             self.scheduler.cancel(event)
             # remove registered callback
             del self.callbacks[lookup]
+
+    @property
+    def time_till_next(self):
+        now = time.time()
+        event_times = [event.time for event in self.scheduler.queue]
+        return max((min(*event_times) - now), 0)
 
     def run(self, **kwargs):
         self.scheduler.run(**kwargs)

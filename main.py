@@ -1,4 +1,5 @@
 # Main loop of the ROV
+from time import sleep
 import logging
 from scheduler import LoopScheduler
 
@@ -34,6 +35,7 @@ logger.info('starting loop')
 while True:
     try:
         looper.run(blocking=False)
+        sleep(looper.time_till_next)
     except KeyboardInterrupt:
         logger.info('User shutdown of ROV loop')
         raise
