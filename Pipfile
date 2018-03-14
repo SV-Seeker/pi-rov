@@ -1,0 +1,19 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+"adafruit-bno055" = "==1.0.2"
+adafruit-gpio = "==1.0.3"
+adafruit-pureio = "==0.2.1"
+curio = "*"
+
+
+[dev-packages]
+
+fake-rpi = "==0.5.1"
+ipdb = "*"

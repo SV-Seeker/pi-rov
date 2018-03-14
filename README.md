@@ -37,27 +37,39 @@ sudo apt-get install -y rpi-update
 sudo rpi-update
 sudo reboot
 # re-login
-sudo apt-get install -y git make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev
+sudo apt-get install -y git make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev supervisor
 curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
 ```
 
-Add this to the bottom of your `.bashrc` file
+Add this to the bottom of the pi users `.bashrc` file
 ```bash
 export PATH="~/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 ```
 
-<!-- TODO: clone down ROV project -->
 ```shell
+git clone https://github.com/SV-Seeker/pi-rov.git rov
 cd rov
 pyenv install
+pyenv virtualenv rov-venv
+./script/rov/update
 ```
-
+installing python takes a while.
 
 # local development setup
 
 ```
+git clone https://github.com/SV-Seeker/pi-rov.git
+git remote add rov pi@rov.local:/home/pi/rov/
+cd pi-rov
+pyenv install
 pyenv virtualenv rov
 pyenv activate
+```
+
+## deploying
+
+```bash
+./script/deploy
 ```
