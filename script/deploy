@@ -1,0 +1,7 @@
+#!/bin/sh
+
+git push rov master
+# ssh pi@rov.local pwd
+# update/install requirements and restart
+# Make sure to switch into the virtual env
+ssh pi@rov.local './rov/script/rov/update && ./rov/script/rov/restart'
