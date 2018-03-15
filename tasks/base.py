@@ -8,16 +8,20 @@ class BaseTask:
     def run(cls):
         return cls().do_loop
 
-    async def do_loop(self, publish):
+    async def do_loop(self, feed):
         # self.data = data
-        self.publish = publish
+        self.feed = feed
         try:
             self.setup()
             while True:
                 await self.run_loop()
                 await curio.sleep(self.loop_time)
+        # TODO: handle setup and loop errors
         except curio.CancelledError:
             self.cleanup()
+
+    async def publish(self, *args, **kwargs):
+        await self.feed.publish(*args, **kwargs)
 
     def setup(self):
         """Setup is complete if we don't error"""

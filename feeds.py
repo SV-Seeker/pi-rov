@@ -1,0 +1,60 @@
+from curio import CancelledError, Queue
+
+
+class Feed:
+
+    def __init__(self, *args, **kwargs):
+        self.queue = Queue()
+        self.subscribers = set()
+
+    async def dispatcher(self):
+        """Whenever a """
+        async for msg in self.queue:
+            for queue in self.subscribers:
+                await queue.put(msg)
+
+    async def publish(self, msg):
+        await self.queue.put(msg)
+
+    async def outgoing(self, *args, **kwargs):
+        queue = Queue()
+        try:
+            self.subscribers.add(queue)
+            async for msg in queue:
+                # Do we need to write back? seperate queue for
+                msg = self.prepare_outgoing(msg)
+                await self.consume_message(msg, *args, **kwargs)
+        finally:
+            self.subscribers.discard(queue)
+
+    def prepare_outgoing(self, msg):
+        return msg
+
+    async def consume_message(self, *args, **kwargs):
+        """return an awaitable write endpoint"""
+        raise NotImplementedError()
+
+    async def incoming(self, *args, **kwargs):
+        try:
+            async for msg in self.feed_messages(*args, **kwargs):
+                msg = self.prepare_incoming(msg)
+                await self.publish(msg)
+        except CancelledError:
+            # TODO handle cancel gracefully
+            raise
+
+    def prepare_incoming(self, msg):
+        return msg
+
+    def feed_messages(self, *args, **kwargs):
+        """must return an asynchronous iterator"""
+        raise NotImplementedError()
+
+
+class ClientStreamFeed(Feed):
+
+    async def consume_message(self, msg, client_stream):
+        await client_stream.write(msg)
+
+    def feed_messages(self, client_stream):
+        return client_stream

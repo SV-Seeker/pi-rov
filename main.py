@@ -10,65 +10,25 @@ from curio import (
     Queue,
     CancelledError
 )
-# from curio.socket import client
+
+from feeds import ClientStreamFeed
 
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-command_queue = Queue()
-reply_queue = Queue()
-subscribers = set()
-
-
-async def dispatcher():
-    async for msg in command_queue:
-        for queue in subscribers:
-            await queue.put(msg)
-
-
-async def publish(msg):
-    await command_queue.put(msg)
-
-
-async def outgoing(client_stream):
-    queue = Queue()
-    try:
-        subscribers.add(queue)
-        async for msg in queue:
-            # Do we need to write back? seperate queue for
-            await client_stream.write(msg)
-    finally:
-        subscribers.discard(queue)
-
-
-async def incoming(client_stream):
-    try:
-        async for line in client_stream:
-            # key is wat
-            try:
-                key, command = line.split(b':')
-            except ValueError:
-                logger.error('malformed message: %s', line)
-            else:
-                # TODO: possibly swap to command queue? naw
-                # await publish((key, command))
-                await publish(command)
-    except CancelledError:
-        await client_stream.write(b'exit')
-        raise
+feed = ClientStreamFeed()
 
 
 async def connection_handler(client, addr):
     logger.info('connection from %s', addr)
     async with client:
         client_stream = client.as_stream()
-        # await
         async with TaskGroup(wait=any) as workers:
-            await workers.spawn(outgoing, client_stream)
-            await workers.spawn(incoming, client_stream)
+            await workers.spawn(feed.outgoing, client_stream)
+            await workers.spawn(feed.incoming, client_stream)
 
-        await publish(b'exit')
+        await feed.publish(b'exit')
     logger.info('connection lost %s', addr)
 
 
@@ -77,19 +37,22 @@ def add_task(Task):
     task = Task.run()
     rov_tasks.append(task)
 
-from tasks import HeartbeatTask, StatusTask
+
+from tasks import ControlTask, HeartbeatTask, StatusTask
 
 add_task(HeartbeatTask)
 add_task(StatusTask)
+add_task(ControlTask)
+
 
 async def server(host, port):
     async with TaskGroup() as group:
-        await group.spawn(dispatcher)
+        await group.spawn(feed.dispatcher)
         await group.spawn(tcp_server, host, port, connection_handler)
 
         for rov_task in rov_tasks:
-            # import ipdb; ipdb.set_trace()
-            await group.spawn(rov_task, publish)
+            await spawn(rov_task, feed)
+
 
 async def main(host, port):
     async with SignalQueue(signal.SIGHUP) as restart:
