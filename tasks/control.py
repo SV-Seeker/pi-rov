@@ -1,36 +1,35 @@
+import logging
+import time
+
+from .base import BaseTask
+from messages import SetupMessage, IMUMessage
+from hardware.imu import BNOIMU, FakeIMU
 
 
-import struct
-import binascii
+logger = logging.getLogger(__name__)
 
-class Message:
-    """
-    automatically create a formatted byte message that can be shared
-    and formatted/parsed,
-    convert a message into bytes, and also parse it
-    """
+
+class ControlTask(BaseTask):
+    loop_time = 0.05  # 20hz
 
     def __init__(self):
-        structs, kwargs = zip(**self.struct_keys)
-        self.packer = struct.Struct(' '.join(structs))
+        # self.imu = BNOIMU()
+        self.imu = FakeIMU()
 
-    def parse(msg):
-        pass
+    async def setup(self):
+        calibration_data = self.imu.get_calibration_status()
+        sys, gyro, accel, mag = calibration_data
+        heading, roll, pitch = self.imu.read_euler()
+        callibration = min(*calibration_data) <= 2
+        msg = SetupMessage(
+            sys=sys, gyro=gyro, accel=accel, mag=mag, heading=heading,
+            roll=roll, pitch=pitch, callibration=callibration)
+        await self.publish(bytes(msg))
 
-    def __str__(self):
-        return binascii.hexlify(packed_data)
-
-    def __bytes__(self):
-        return self.packer.pack(*values)
-
-
-class SetupMessage(Message):
-    struct_keys = (
-        ('f', 'heading'),
-        ('f', 'roll'),
-        ('f', 'pitch'),
-        ('i', 'sys'),
-        ('i', 'gyro'),
-        ('i', 'accel'),
-        ('i', 'mag'),
-    )
+    async def run_loop(self):
+        """Run control loop and make adjustments to drive state"""
+        heading, roll, pitch = self.imu.read_euler()
+        msg = IMUMessage(heading=heading, roll=roll, pitch=pitch)
+        await self.publish(bytes(msg))
+        logger.debug('control looped at: %s', time.time())
+        logger.debug("%s,%s,%s", heading, roll, pitch)
