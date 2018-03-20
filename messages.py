@@ -67,3 +67,6 @@ class IMUMessage(Message):
         ('i', 'roll'),
         ('i', 'pitch'),
     )
+
+
+EXIT = b'x'

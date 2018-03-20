@@ -48,14 +48,12 @@ Add this to the bottom of the pi users `.bashrc` file
 ```bash
 export PATH="~/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 ```
 
 ```shell
 git clone https://github.com/SV-Seeker/pi-rov.git rov
 cd rov
 pyenv install
-pyenv virtualenv rov-venv
 ./script/rov/update
 ```
 installing python takes a while.

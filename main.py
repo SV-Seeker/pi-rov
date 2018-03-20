@@ -1,4 +1,4 @@
-import signal
+import signal as signals
 import logging
 
 from curio import (
@@ -12,9 +12,10 @@ from curio import (
 )
 
 from feeds import ClientStreamFeed
+import messages
 
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 feed = ClientStreamFeed()
@@ -28,7 +29,8 @@ async def connection_handler(client, addr):
             await workers.spawn(feed.outgoing, client_stream)
             await workers.spawn(feed.incoming, client_stream)
 
-        await feed.publish(b'exit')
+        # May not need this
+        await feed.publish(messages.EXIT)
     logger.info('connection lost %s', addr)
 
 
@@ -51,20 +53,19 @@ async def server(host, port):
         await group.spawn(tcp_server, host, port, connection_handler)
 
         for rov_task in rov_tasks:
-            await spawn(rov_task, feed)
+            await group.spawn(rov_task, feed)
 
 
 async def main(host, port):
-    async with SignalQueue(signal.SIGHUP) as restart:
-        while True:
-            logger.info('Starting the server')
-            serv_task = await spawn(server, host, port)
-            await restart.get()
-            logger.info('Server shutting down')
-            await serv_task.cancel()
+    async with SignalQueue(signals.SIGHUP, signals.SIGTERM) as close_signals:
+        logger.info('Starting the server')
+        serv_task = await spawn(server, host, port)
+        signal = await close_signals.get()
+        logger.info('Server shutting down: %s', signal)
+        await serv_task.cancel()
 
 
 if __name__ == '__main__':
-    from curio.debug import schedtrace
+    # from curio.debug import schedtrace
     # run(main('', 9000), with_monitor=True, debug=schedtrace)
     run(main('', 9000))

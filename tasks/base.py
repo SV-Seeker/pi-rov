@@ -1,4 +1,8 @@
 import curio
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseTask:
@@ -29,6 +33,7 @@ class BaseTask:
 
     async def cleanup(self):
         """Cleaning up loop when we're canceling the event loop"""
+        logger.info('cleanup for %s', self.__class__.__name__)
         pass
 
     async def run_loop(self):
