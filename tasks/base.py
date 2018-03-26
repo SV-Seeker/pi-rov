@@ -1,3 +1,5 @@
+import time
+
 import curio
 import logging
 
@@ -22,9 +24,21 @@ class BaseTask:
         self.feed = feed
         try:
             await self.setup()
+            end_time = None
             while True:
-                await self.run_loop()
-                await curio.sleep(self.loop_time)
+                start_time = time.time()
+                await self.run_loop(last_run=end_time)
+                end_time = time.time()
+
+                elapsed_time = (end_time - start_time)
+                diff = max(self.loop_time - elapsed_time, 0)
+                if elapsed_time > self.loop_time:
+                    logger.warning(
+                        '%s Ran over by %s!',
+                        self.__class__.__name__,
+                        elapsed_time - self.loop_time
+                    )
+                await curio.sleep(diff)
         # TODO: handle setup and loop errors
         except curio.CancelledError:
             await self.cleanup()
@@ -34,6 +48,7 @@ class BaseTask:
 
     async def setup(self):
         """Setup is complete if we don't error"""
+        logger.info('setup for %s', self.__class__.__name__)
         pass
 
     async def cleanup(self):
