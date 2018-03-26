@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class HeartbeatTask(BaseTask):
-    loop_time = 1  # 1hz
+    frequency = 1  # 1hz
 
     async def run_loop(self):
         logger.debug('heartbeat task ran at: %s', time.time())

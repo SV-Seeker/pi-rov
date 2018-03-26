@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class ControlTask(BaseTask):
-    loop_time = 0.05  # 20hz
+    frequency = 20  # hz
 
     def __init__(self):
         # self.imu = BNOIMU()

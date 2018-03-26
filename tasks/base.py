@@ -7,6 +7,11 @@ logger = logging.getLogger(__name__)
 
 class BaseTask:
     loop_time = 1  # 1hz
+    frequency = None
+
+    def __init__(self):
+        if hasattr(self, 'frequency'):
+            self.loop_time = 1 / self.frequency
 
     @classmethod
     def run(cls):
