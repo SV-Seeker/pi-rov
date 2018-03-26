@@ -1,5 +1,4 @@
 import signal as signals
-import logging
 
 from curio import (
     run,
@@ -14,10 +13,15 @@ from curio import (
 from feeds import ClientStreamFeed
 import messages
 from config import config
+from logs import setup_logging
 
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = setup_logging(__name__)
+
+
+# TODO: convert all this into a class that is configurable
+# Make the messaging layer agnostic?
+#
 
 feed = ClientStreamFeed()
 
