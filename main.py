@@ -13,6 +13,7 @@ from curio import (
 
 from feeds import ClientStreamFeed
 import messages
+from config import config
 
 
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -68,4 +69,7 @@ async def main(host, port):
 if __name__ == '__main__':
     # from curio.debug import schedtrace
     # run(main('', 9000), with_monitor=True, debug=schedtrace)
-    run(main('', 9000))
+    try:
+        run(main('', config.get('port')))
+    except KeyboardInterrupt:
+        pass
