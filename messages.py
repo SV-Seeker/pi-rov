@@ -1,12 +1,18 @@
-import struct
 import binascii
+import struct
+from collections.abc import Mapping
 
 
-class Message:
+class Message(Mapping):
     """
     automatically create a formatted byte message that can be shared
     and formatted/parsed,
     convert a message into bytes, and also parse it
+
+    TODO:
+    * allow for default values, (msg version, dynamic fields for mixins)
+    * error handling/exceptions for missing arguments
+    * attribute for a message key that is unique across all messages.
     """
     struct_keys = tuple()
 
@@ -39,13 +45,23 @@ class Message:
         return dict(zip(self.make_kwargs, unpacked_value))
 
     def __str__(self):
-        return binascii.hexlify(self.packed_value)
-
-    def __dict__(self):
-        return self.value
+        # return binascii.hexlify(self.packed_value)
+        pass
 
     def __bytes__(self):
         return self.packed_value
+
+    def __contains__(self, value):
+        return value in self.value.keys()
+
+    def __iter__(self):
+        return iter(self.value)
+
+    def __getitem__(self, value):
+        return self.value[value]
+
+    def __len__(self):
+        return len(self.value)
 
 
 class SetupMessage(Message):
