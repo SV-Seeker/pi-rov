@@ -1,8 +1,7 @@
+import logging
 import time
 
 import curio
-import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -56,5 +55,5 @@ class BaseTask:
         logger.info('cleanup for %s', self.__class__.__name__)
         pass
 
-    async def run_loop(self):
+    async def run_loop(self, **kwargs):
         raise NotImplementedError('run_loop needs implemented')

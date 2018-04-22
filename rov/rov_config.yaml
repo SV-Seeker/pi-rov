@@ -1,0 +1,8 @@
+# log_level: debug
+port: 8000
+redis:
+  host: localhost
+  port: 6379
+  # - max_connections: 123
+  # - db: 0  # not implimented
+loop_freq: 20

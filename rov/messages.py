@@ -1,6 +1,8 @@
-import binascii
 import struct
 from collections.abc import Mapping
+from copy import copy
+
+EXIT = b'x'
 
 
 class Message(Mapping):
@@ -45,7 +47,7 @@ class Message(Mapping):
         return dict(zip(self.make_kwargs, unpacked_value))
 
     def __str__(self):
-        # return binascii.hexlify(self.packed_value)
+        # TODO: str rep
         pass
 
     def __bytes__(self):
@@ -85,4 +87,4 @@ class IMUMessage(Message):
     )
 
 
-EXIT = b'x'
+message_types = Message.__subclasses__()

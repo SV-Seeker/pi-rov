@@ -54,15 +54,6 @@ class BNOIMU(BNO055.BNO055, BaseIMU):
         with open(filename, 'w') as f:
             json.dump(json_data, f, indent=4, sort_keys=True)
 
-    # bno = BNO055.BNO055(rst=RESET_PIN)
-
-    # heading, roll, pitch = bno.read_euler()
-    # # Read the calibration status, 0=uncalibrated and 3=fully calibrated.
-    # sys, gyro, accel, mag = bno.get_calibration_status()
-
-    # print('Heading={0:0.2F} Roll={1:0.2F} Pitch={2:0.2F}\tSys_cal={3} Gyro_cal={4} Accel_cal={5} Mag_cal={6}'.format(
-    #       heading, roll, pitch, sys, gyro, accel, mag))
-
 
 class FakeIMU(BaseIMU):
     """Fake methods for testing"""
@@ -78,3 +69,12 @@ class FakeIMU(BaseIMU):
 
     def read_euler(self):
         return (random.randint(0, 500), random.randint(0, 500), random.randint(0, 500))
+
+
+types = {
+    'bno': BNOIMU,
+    'fake': FakeIMU,
+}
+
+
+__all__ = ['types', 'BNOIMU', 'FakeIMU']

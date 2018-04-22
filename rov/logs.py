@@ -1,6 +1,6 @@
 import logging
-from config import config
 
+from config import config
 
 LOGGING_LEVEL = getattr(logging, config.get('log_level').upper())
 

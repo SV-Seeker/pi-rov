@@ -9,7 +9,7 @@ class BaseServo(object):
     def __init__(self, pwm, channel=0):
         try:
             self.debug = pwm.debug
-        except:
+        except Exception as e:
             self.debug = False
 
         self.pwm = pwm
@@ -20,9 +20,9 @@ class BaseServo(object):
         self.max = 2000
         self.range = ((self.max - self.min) / 2)
         self.mid = self.max - self.range
-        self.cycle = 50 # 50hz cycle
-        self.pulseLength = 1000000 / self.cycle
-        self.tick = self.pulseLength / 4096 # 12 bit resolution
+        self.cycle = 50  # 50hz cycle
+        self.pulse_length = 1000000 / self.cycle
+        self.tick = self.pulse_length / 4096  # 12 bit resolution
 
     def set_pulse(self, pulse):
         """set the pulse on this servo's channel"""
@@ -66,5 +66,5 @@ class Servo(BaseServo):
         return (((self.max - self.min) * deg) / self.total_deg) + self.min
 
     def to_deg(self, deg):
-        logger.debug("moving to %s degrees" % deg)
+        logger.debug("moving to %s degrees", deg)
         self.set_pulse(self._get_pulse_for_deg(deg))

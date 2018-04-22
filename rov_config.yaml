@@ -1,4 +1,0 @@
-# log_level: debug
-port: 8000
-redis: redis://@localhost:6379/0
-loop_freq: 20

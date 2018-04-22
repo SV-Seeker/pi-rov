@@ -1,14 +1,17 @@
+import logging
+
 from curio import CancelledError, Queue
+
+logger = logging.getLogger(__name__)
 
 
 class Feed:
-
     def __init__(self, *args, **kwargs):
         self.queue = Queue()
         self.subscribers = set()
 
     async def dispatcher(self):
-        """Whenever a """
+        """Whenever queue is hydrated push it to all subscribers"""
         async for msg in self.queue:
             for queue in self.subscribers:
                 await queue.put(msg)
@@ -16,6 +19,7 @@ class Feed:
     async def publish(self, msg):
         await self.queue.put(msg)
 
+    # Outgoing handling
     async def outgoing(self, *args, **kwargs):
         queue = Queue()
         try:
@@ -34,10 +38,12 @@ class Feed:
         """return an awaitable write endpoint"""
         raise NotImplementedError()
 
+    # Incoming handling
     async def incoming(self, *args, **kwargs):
         try:
             async for msg in self.feed_messages(*args, **kwargs):
                 msg = self.prepare_incoming(msg)
+                # Do we want to do this? how do we disable removing the echo response?
                 await self.publish(msg)
         except CancelledError:
             # TODO handle cancel gracefully
