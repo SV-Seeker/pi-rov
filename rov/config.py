@@ -1,10 +1,13 @@
 import bison
 
 scheme = bison.Scheme(
-    bison.Option('log_level', default='info', choices=['debug', 'info', 'warn', 'error']),
+    bison.Option('log_level', default='info', choices=[
+        'debug', 'info', 'warn', 'error']),
     bison.Option('port', default=9000, field_type=int),
+    bison.Option('imu', default='fake', choices=['fake', 'bno']),
     bison.Option('redis')
 )
+
 
 config = bison.Bison(scheme)
 
@@ -14,6 +17,7 @@ config.add_config_paths(
     '.',
     '/tmp/app'
 )
+
 
 config.parse()
 
